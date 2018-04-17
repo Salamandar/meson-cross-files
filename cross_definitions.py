@@ -22,7 +22,12 @@ class CrossDefinitions():
             'host_machine':   host_machine,
             'target_machine': target_machine,
         }
-        self.sections_base = {}
+        self.sections_base = {
+            'binaries':       None,
+            'properties':     None,
+            'host_machine':   None,
+            'target_machine': None,
+        }
 
     # Write to destdir/filename or filename
     def write_to_file(self, destdir=''):
@@ -53,6 +58,7 @@ class CrossDefinitions():
                 if values is not None:
                     write_section(name, values)
 
+    # TODO merge arrays instead of replace ?
     def merge_to_base(self, base, overlay):
         for (ov_name, ov_values) in overlay.items():
             if ov_values is not None:
@@ -75,11 +81,29 @@ class CrossDefinitions():
 
 ###############################################################################
 
+# Some examples of use
+
+# NB : for "virtual" definitions like openocd or arm_none_eabi, writing to file
+# is **not** necessary!
+
+def ARM(cpu):
+    return CrossDefinitions(
+        'arm/ARM architecture ' + cpu,
+        '',
+        host_machine={
+            'cpu_family': 'arm',
+            'endian':     'little',
+            'system':     'none',
+            'cpu':        cpu,
+        }
+    )
+
+
 
 arm_none_eabi = CrossDefinitions(
-    'arm-none-eabi-base',
+    'arm/arm-none-eabi-base',
     'Base of arm-none-eabi defs',
-    {
+    binaries={
         'c':        'arm-none-eabi-' + 'gcc',
         'cpp':      'arm-none-eabi-' + 'g++',
         'ld':       'arm-none-eabi-' + 'ld',
@@ -98,7 +122,8 @@ openocd = CrossDefinitions('openocd', '', {'openocd': 'openocd', })
 openocd.write_to_file()
 
 
-stm32 = CrossDefinitions('stm32/somemcu', 'Definitions for stm32')
-stm32.based_on(arm_none_eabi)
-stm32.based_on(openocd)
-stm32.write_to_file()
+stm32f0 = CrossDefinitions('arm/stm32/stm32f0', 'Definitions for stm32f0')
+stm32f0.based_on(ARM('cortex-m0'))
+stm32f0.based_on(arm_none_eabi)
+stm32f0.based_on(openocd)
+stm32f0.write_to_file()
