@@ -28,12 +28,15 @@ class CrossDefinitions():
     def write_to_file(self, destdir=''):
         self.__apply_base()
 
-        with open(os.path.join(destdir, self.name + '.txt'), 'w') as crossfile:
+        outfilepath = os.path.join(destdir, self.name + '.txt')
+        os.makedirs(os.path.dirname(outfilepath) or '.', exist_ok=True)
+        with open(outfilepath, 'w') as crossfile:
 
             # Write commented description
             crossfile.write(''.join([
                 '# ' + i for i in self.description.splitlines(True)
             ]))
+            crossfile.write('\n')
 
             # Write section and its variables
             def write_section(name, variables):
@@ -95,7 +98,7 @@ openocd = CrossDefinitions('openocd', '', {'openocd': 'openocd', })
 openocd.write_to_file()
 
 
-stm32 = CrossDefinitions('stm32', 'Definitions for stm32')
-stm32.based_on(openocd)
+stm32 = CrossDefinitions('stm32/somemcu', 'Definitions for stm32')
 stm32.based_on(arm_none_eabi)
+stm32.based_on(openocd)
 stm32.write_to_file()
