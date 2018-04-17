@@ -12,6 +12,7 @@ class CrossDefinitions():
                  properties=None,
                  host_machine=None,
                  target_machine=None):
+        self.used = False
         self.name = name
         self.description = description
 
@@ -58,11 +59,14 @@ class CrossDefinitions():
 
     # Update as an overlay to base
     def based_on(self, base):
+        if self.used:
+            raise RuntimeError('Definitions ' + self.name + ' already used!')
+        base.__apply_base()
         self.description += '\nBased on \'{0}\''.format(base.name)
         self.merge_to_base(self.sections_base, base.sections_base)
-        self.merge_to_base(self.sections_base, base.sections_overlay)
 
     def __apply_base(self):
+        self.used = True
         self.merge_to_base(self.sections_base, self.sections_overlay)
 
 
