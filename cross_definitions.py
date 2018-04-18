@@ -58,13 +58,27 @@ class CrossDefinitions():
                 if values is not None:
                     write_section(name, values)
 
-    # TODO merge arrays instead of replace ?
-    def merge_to_base(self, base, overlay):
-        for (ov_name, ov_values) in overlay.items():
-            if ov_values is not None:
-                if ov_name not in base or base[ov_name] is None:
-                    base[ov_name] = dict()
-                base[ov_name].update(ov_values)
+    def merge_to_base(self, baselay, overlay):
+        for section in overlay.keys():
+            if overlay[section] is not None:
+
+                # Initialize as dict first…
+                if section not in baselay or \
+                   baselay[section] is None:
+                    baselay[section] = dict()
+
+                # Replace scalars, merge lists
+                for it in overlay[section].keys():
+                    if it in baselay[section] and \
+                      (isinstance(overlay[section][it], list) or \
+                       isinstance(baselay[section][it], list)):
+                        baselay[section][it] = [
+                            item for sublist in [
+                                baselay[section][it], overlay[section][it],
+                            ] for item in sublist
+                        ]
+                    else:
+                        baselay[section][it] = overlay[section][it]
 
     # Update as an overlay to base
     def based_on(self, base):
