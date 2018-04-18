@@ -5,13 +5,16 @@ import os
 
 
 class CrossDefinitions():
-    def __init__(self,
-                 name,
-                 description,
-                 binaries=None,
-                 properties=None,
-                 host_machine=None,
-                 target_machine=None):
+    def __init__(
+            self,
+            name,
+            description,
+            binaries=None,
+            properties=None,
+            host_machine=None,
+            target_machine=None,
+            based_on=None
+         ):
         self.used = False
         self.name = name
         self.description = description
@@ -28,6 +31,11 @@ class CrossDefinitions():
             'host_machine':   None,
             'target_machine': None,
         }
+        if based_on is not None:
+            if not isinstance(based_on, list):
+                based_on = [based_on]
+            for i in based_on:
+                self.based_on(i)
 
     # Write to destdir/filename or filename
     def write_to_file(self, destdir=''):
