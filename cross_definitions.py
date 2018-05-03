@@ -9,11 +9,11 @@ class CrossDefinitions():
             self,
             name,
             description,
-            binaries=None,
-            properties=None,
-            host_machine=None,
-            target_machine=None,
-            based_on=None
+            binaries={},
+            properties={},
+            host_machine={},
+            target_machine={},
+            based_on=[]
          ):
         self.used = False
         self.name = name
@@ -26,12 +26,12 @@ class CrossDefinitions():
             'target_machine': target_machine,
         }
         self.sections_base = {
-            'binaries':       None,
-            'properties':     None,
-            'host_machine':   None,
-            'target_machine': None,
+            'binaries':       {},
+            'properties':     {},
+            'host_machine':   {},
+            'target_machine': {},
         }
-        if based_on is not None:
+        if based_on:
             if not isinstance(based_on, list):
                 based_on = [based_on]
             for i in based_on:
@@ -63,30 +63,27 @@ class CrossDefinitions():
 
             # Write all sections, if not empty
             for name, values in self.sections_base.items():
-                if values is not None:
+                if values:
                     write_section(name, values)
 
     def merge_to_base(self, baselay, overlay):
         for section in overlay.keys():
-            if overlay[section] is not None:
+            # Initialize as dict first…
+            if section not in baselay:
+                baselay[section] = {}
 
-                # Initialize as dict first…
-                if section not in baselay or \
-                   baselay[section] is None:
-                    baselay[section] = dict()
-
-                # Replace scalars, merge lists
-                for it in overlay[section].keys():
-                    if it in baselay[section] and \
-                      (isinstance(overlay[section][it], list) or \
-                       isinstance(baselay[section][it], list)):
-                        baselay[section][it] = [
-                            item for sublist in [
-                                baselay[section][it], overlay[section][it],
-                            ] for item in sublist
-                        ]
-                    else:
-                        baselay[section][it] = overlay[section][it]
+            # Replace scalars, merge lists
+            for it in overlay[section].keys():
+                if it in baselay[section] and \
+                  (isinstance(overlay[section][it], list) or \
+                   isinstance(baselay[section][it], list)):
+                    baselay[section][it] = [
+                        item for sublist in [
+                            baselay[section][it], overlay[section][it],
+                        ] for item in sublist
+                    ]
+                else:
+                    baselay[section][it] = overlay[section][it]
 
     # Update as an overlay to base
     def based_on(self, base):
