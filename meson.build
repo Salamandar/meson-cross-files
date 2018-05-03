@@ -5,20 +5,20 @@ project('meson-cross-files',
 
 
 
-parts = [
-  [ 'arm', 'arm.py' ],
-]
-
-foreach part: parts
-  subdir = part[0]
-  script = part[1]
-
-  custom_target(subdir,
-    depend_files: [ 'cross_definitions.py', script, ],
-    command: [ find_program(script), ],
-    output: subdir,
-    install: true,
-    install_dir: join_paths(get_option('datadir'), 'meson', 'cross')
-  )
-
-endforeach
+custom_target('generate',
+  depend_files: [
+    'cross_definitions.py',
+    'all.py',
+    'arm.py',
+    'misc.py',
+    'mingw.py',
+  ],
+  command: [ find_program('all.py'), ],
+  output: [
+    'arm',
+    'iphone',
+    'mingw',
+  ],
+  install: true,
+  install_dir: join_paths(get_option('datadir'), 'meson', 'cross')
+)

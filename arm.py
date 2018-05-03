@@ -41,6 +41,38 @@ def RISCV(base='rv32i', extensions=''):
 # Toolchains
 
 
+arm_linux_gnueabi_gcc = CrossDefinitions(
+    'arm/arm-linux-gnueabihf-gcc-base',
+    'Base of arm-linux-gnueabihf defs',
+    binaries={
+        'c':        'arm-linux-gnueabihf-gcc',
+        'cpp':      'arm-linux-gnueabihf-g++',
+        'rust':     ['rustc', '--target', 'arm-unknown-linux-gnueabihf'],
+                    # '-C', 'linker=/usr/bin/arm-linux-gnueabihf-gcc-7'
+        'ld':       'arm-linux-gnueabihf-ld',
+        'ar':       'arm-linux-gnueabihf-ar',
+        'as':       'arm-linux-gnueabihf-as',
+        'size':     'arm-linux-gnueabihf-size',
+        'objdump':  'arm-linux-gnueabihf-objdump',
+        'objcopy':  'arm-linux-gnueabihf-objcopy',
+        'strip':    'arm-linux-gnueabihf-strip',
+        'gdb':      'arm-linux-gnueabihf-gdb',
+        'pkgconfig':'arm-linux-gnueabihf-pkg-config',
+    },
+    properties={
+        'root': '/usr/arm-linux-gnueabihf',
+        'c_args': [
+        ],
+        'has_function_printf': True,
+        'has_function_hfkerhisadf': False,
+    },
+    host_machine={
+        'system': 'linux',
+        'cpu_family': 'arm',
+    }
+)
+
+
 arm_none_eabi_gcc = CrossDefinitions(
     'arm/arm-none-eabi-gcc-base',
     'Base of arm-none-eabi defs',
@@ -193,4 +225,3 @@ for i in [
     i.write_to_file()
 
 # STM32 specific mcus
-
